@@ -49,3 +49,7 @@ https://www.youtube.com/watch?v=JRCln3DkfBo&t=422s&ab_channel=IndieVitalja
 2) Установка torch и torchvision only-cpu версий
 
 3) Скачивание только первых 5 pretrained слоев vgg19 (Источник, который помог это реализовать: https://pytorch.org/tutorials/beginner/saving_loading_models.html), это позволило сократить количество занимаемой памяти для модели с 548МБ до 2МБ. Я локально установил всю модель и скачал лишь первые слои, после сделал их загрузку в модель.
+
+Пример работы модели:
+
+https://drive.google.com/file/d/19C_mkNB6h25XEGlQfMhFT2DjKwIgqFm9/view?usp=sharing
