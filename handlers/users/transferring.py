@@ -48,6 +48,7 @@ async def get_content_photo(message: types.Message, state: FSMContext):
 
 @dp.message_handler(Text(equals=["Выбрать стиль из предложенных"]), state=None)
 async def transferring_with_suggested_photo(message: types.Message):
+    #  Отправка трех изображений одновременно
     media = types.MediaGroup()
     media.attach_photo(types.InputFile('data/images/Van_Gogh.jpg'), 'Винсент ван Гог - "Звездная ночь"')
     media.attach_photo(types.InputFile('data/images/Picasso.jpg'), 'Пабло Пикассо - "Сидящая обнаженная"')
@@ -90,7 +91,8 @@ async def get_content_photo_style1(message: types.Message, state: FSMContext):
     await message.photo[-1].download('data/images/content_mystyle.jpg')
     await message.answer(
         "Спасибо, остлось подождать несколько минут, пока нейронная сеть переносит стиль на твою фотографию")
-
+    
+    #  Получаем ответ пользователя
     data = await state.get_data()
     q1 = data.get("q1")
 
