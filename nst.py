@@ -22,7 +22,8 @@ class ImageLoad:
 
     def content_loader(self, image_name):
         image = Image.open(image_name)
-
+        
+        # Пропорционально меняю размер изображения
         size = [image.size[1], image.size[0]]
         if size[0] * size[1] > 230000:
             x = int(size[0] * size[1] / 230000)
@@ -190,10 +191,6 @@ class NeuralStyleTransfer:
                 with torch.no_grad():
                     input_img.clamp_(0, 1)
 
-                if run[0] % 50 == 0:
-                    history = list()
-                    history.append(input_img.clone())
-
                 optimizer.zero_grad()
                 model(input_img)
                 style_score = 0
@@ -211,7 +208,7 @@ class NeuralStyleTransfer:
                 loss.backward()
 
                 run[0] += 1
-                if run[0] % 1 == 0:
+                if run[0] % 50 == 0:
                     print("run {}:".format(run))
                     print('Style Loss : {:4f} Content Loss: {:4f}'.format(
                         style_score.item(), content_score.item()))
@@ -245,8 +242,9 @@ def gram_matrix(input):
 async def transferring(content_path, style_path, output_path):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    img_loader = ImageLoad(content_path, style_path)
-
+    img_loader = ImageLoad(content_path, style_path)  # Загружаем изображения
+    
+    #  Загрузка первых пяти слоев vgg19
     cnn = models.vgg19(pretrained=False)
     cnn.features[:11].load_state_dict(torch.load("pretrained_models/features"))
     cnn = cnn.features.to(device).eval()
@@ -257,13 +255,15 @@ async def transferring(content_path, style_path, output_path):
     nst = NeuralStyleTransfer(cnn=cnn)
 
     input_img = img_loader.content_img.clone()
-
+    
+    # Запуск "обучения"
     output_img = nst.run_style_transfer(cnn_normalization_mean, cnn_normalization_std,
                                         img_loader.content_img, img_loader.style_img,
                                         input_img=input_img, num_steps=300)
     output_img = output_img.cpu().clone()  # we clone the tensor to not do changes on it
     save_image(output_img, output_path)
-
+    
+    # Очистка мусора
     del output_img
     del cnn
     del img_loader
